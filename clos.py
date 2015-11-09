@@ -5,18 +5,29 @@ class clos(Topo):
     def __init__(self, leaf, spine):
         Topo.__init__(self)
 
-        spineDevs = self.create_spine(spine)
-        leafDevs = self.create_leaf(leaf)
+        spineDevs = self.create_devices(self.addSwitch, "ss", spine)
+        leafDevs = self.create_devices(self.addSwitch, "ls", leaf)
+        hostDevs = self.create_devices(self.addHost, "h", leaf)
 
-        self.hookup(spineDevs, leafDevs)
+        self.hookup(spineDevs, leafDevs, hostDevs)
 
-    def create_spine(self, nofDevices):
-        return []
+    def create_devices(self, addFunc, prefix, nofDevices):
+        devices = list()
 
-    def create_leaf(self, nofDevices):
-        return []
+        for devID in range(0, nofDevices):
+            devices.append( addFunc( prefix + str(devID + 1) ) )
 
-    def hookup(self, spineDevices, leafDevices):
-        pass
+        return devices
+
+    def hookup(self, spineDevices, leafDevices, hostDevices):
+        leafIndex = 0
+        for ldev in leafDevices:
+            hdev = hostDevices[leafIndex]
+            self.addLink(ldev, hdev)
+            hdev.setIP("10.0.0." + str(leafIndex + 1), 24)
+            leafIndex += 1
+            for sdev in spineDevices:
+                self.addLink(ldev, sdev)
+
 
 topos = { 'clos': clos }
