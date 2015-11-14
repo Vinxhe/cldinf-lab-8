@@ -42,13 +42,19 @@ topos = { 'clos3': clos3 }
 def addIpAddresses(net):
     for i in range (0, len(net.topo.spineDevs)):
         spineDev=net.getNodeByName(net.topo.spineDevs[i])
+        spineDev.cmd("sysctl -w net.ipv4.ip_forward=1")
         for j in range (0, len(spineDev.intfList())):
             myIp="10.{0}.{1}.1".format(i+1,j+1)
             spineDev.intfList()[j].link.intf1.setIP(myIp, 30)
             otherIp="10.{0}.{1}.2".format(i+1,j+1)
             spineDev.intfList()[j].link.intf2.setIP(otherIp, 30)
+            clientnet="10.0.{0}.0/30".format(j+1)
+            router="10.{0}.{1}.1".format(i+1,j+1)
+            print(spineDev.name + " ip route add " + clientnet + " via " + router)
+            spineDev.cmd("ip route add " + clientnet + " via " + router)
     for i in range (0, len(net.topo.leafDevs)):
         leafDev=net.getNodeByName(net.topo.leafDevs[i])
+        leafDev.cmd("sysctl -w net.ipv4.ip_forward=1")
         otherIp="10.1.{0}.1".format(i+1)
         leafDev.setDefaultRoute("dev " + leafDev.intfList()[1].name + " via " + otherIp)
     for i in range (0, len(net.topo.hostDevs)):
