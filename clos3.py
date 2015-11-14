@@ -43,19 +43,19 @@ def addIpAddresses(net):
     for i in range (0, len(net.topo.spineDevs)):
         spineDev=net.getNodeByName(net.topo.spineDevs[i])
         for j in range (0, len(spineDev.intfList())):
-            myIp="10." + str(i+1) + "." + str(j+1) + ".1"
+            myIp="10.{0}.{1}.1".format(i+1,j+1)
             spineDev.intfList()[j].link.intf1.setIP(myIp, 30)
-            otherIp="10." + str(i+1) + "." + str(j+1) + ".2"
+            otherIp="10.{0}.{1}.2".format(i+1,j+1)
             spineDev.intfList()[j].link.intf2.setIP(otherIp, 30)
     for i in range (0, len(net.topo.leafDevs)):
         leafDev=net.getNodeByName(net.topo.leafDevs[i])
-        otherIp="10.1." + str(i+1) + ".1"
+        otherIp="10.1.{0}.1".format(i+1)
         leafDev.setDefaultRoute("dev " + leafDev.intfList()[1].name + " via " + otherIp)
     for i in range (0, len(net.topo.hostDevs)):
         hostDev=net.getNodeByName(net.topo.hostDevs[i])
-        myIp="10.0." + str(i+1) + ".2"
+        myIp="10.0.{0}.2".format(i+1)
         hostDev.intfList()[0].link.intf1.setIP(myIp, 30)
-        otherIp="10.0." + str(i+1) + ".1"
+        otherIp="10.0.{0}.1".format(i+1)
         hostDev.intfList()[0].link.intf2.setIP(otherIp, 30)
         hostDev.setDefaultRoute("dev " + hostDev.intfList()[0].name + " via " + otherIp)
 
