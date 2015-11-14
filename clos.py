@@ -31,7 +31,7 @@ class clos(Topo):
             if (withIP == True):
                 devices.append( addFunc( prefix + str(devID + 1), ip='10.0.0.' + str(devID + 1) ) )
             else:
-                devices.append( addFunc( prefix + str(devID + 1), stp_enable='true' ) )
+                devices.append( addFunc( prefix + str(devID + 1) ) )
         return devices
 
     def hookup(self, spineDevices, leafDevices, hostDevices):
@@ -39,10 +39,8 @@ class clos(Topo):
         for ldev in leafDevices:
             hdev = hostDevices[leafIndex]
             self.addLink(ldev, hdev)
-            #hdev.setIP("10.0.0." + str(leafIndex + 1), 24)
             leafIndex += 1
             for sdev in spineDevices:
                 self.addLink(ldev, sdev)
-
 
 topos = { 'clos': clos }
