@@ -60,6 +60,10 @@ def addIpAddresses(net):
         leafDev.cmd("sysctl -w net.ipv4.ip_forward=1")
         otherIp="10.1.{0}.1".format(i+1)
         leafDev.cmd("ip route add default via " + otherIp)
+        spineNet="10.{0}.0.0/16".format(i+1)
+        spineRouter="10.{0}.{0}.1".format(i+1)
+        leafDev.cmd("ip route add " + spineNet + " via " + spineRouter)
+        print(leafDev.name + " ip route add " + spineNet + " via " + spineRouter)
     for i in range (0, len(net.topo.hostDevs)):
         hostDev=net.getNodeByName(net.topo.hostDevs[i])
         myIp="10.0.{0}.2".format(i+1)
