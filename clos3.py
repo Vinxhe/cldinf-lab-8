@@ -8,6 +8,7 @@ from mininet.cli import CLI
 from mininet.topo import Topo
 from mininet.util import quietRun
 from mininet.moduledeps import pathCheck
+from mininet.util import dumpNodeConnections
 
 class clos3(Topo):
 
@@ -45,6 +46,8 @@ def layer3net(leaf, spine):
     info( '*** Creating network\n' )
     net = Mininet(topo=topo, controller=OVSController, switch=OVSSwitch)
     net.start()
+    #dumpNodeConnections(net.values())
+
     CLI(net)
     net.stop()
 
