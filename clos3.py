@@ -41,33 +41,6 @@ class clos3(Topo):
 
 topos = { 'clos3': clos3 }
 
-class MyController( Controller ):
-
-    def __init__( self, name, inNamespace=False, command='controller',
-                 cargs='-v ptcp:%d', cdir=None, ip="127.0.0.1",
-                 port=6633, **params ):
-        """command: controller command name
-           cargs: controller command arguments
-           cdir: director to cd to before running controller
-           ip: IP address for controller
-           port: port for controller to listen at
-           params: other params passed to Node.__init__()"""
-        Controller.__init__( self, name, ip=ip, port=port, **params)
-
-    def start( self ):
-        """Start <controller> <args> on controller.
-            Log to /tmp/cN.log"""
-        pathCheck( self.command )
-        cout = '/tmp/' + self.name + '.log'
-        if self.cdir is not None:
-            self.cmd( 'cd ' + self.cdir )
-        self.cmd( self.command, self.cargs % self.port, '>&', cout, '&' )
-
-    def stop( self ):
-        "Stop controller."
-        self.cmd( 'kill %' + self.command )
-        self.terminate()
-
 def layer3net(leaf, spine):
     if os.geteuid() != 0:
         exit("you need to be root to run this script")
