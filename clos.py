@@ -31,7 +31,7 @@ class clos(Topo):
             if (withIP == True):
                 devices.append( addFunc( prefix + str(devID + 1), ip='10.0.0.' + str(devID + 1) ) )
             else:
-                devices.append( addFunc( prefix + str(devID + 1) ) )
+                devices.append( addFunc( prefix + str(devID + 1), cls=OVSBridgeSTP ) )
         return devices
 
     def hookup(self, spineDevices, leafDevices, hostDevices):
