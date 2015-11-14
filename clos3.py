@@ -14,20 +14,17 @@ class clos3(Topo):
     def __init__(self, leaf, spine):
         Topo.__init__(self)
 
-        spineDevs = self.create_devices(self.addSwitch, "ss", spine, False)
-        leafDevs = self.create_devices(self.addSwitch, "ls", leaf, False )
-        hostDevs = self.create_devices(self.addHost, "h", leaf, True )
+        spineDevs = self.create_devices(self.addHost, "ss", spine )
+        leafDevs = self.create_devices(self.addHost, "ls", leaf )
+        hostDevs = self.create_devices(self.addHost, "h", leaf )
 
         self.hookup(spineDevs, leafDevs, hostDevs)
 
-    def create_devices(self, addFunc, prefix, nofDevices, withIP ):
+    def create_devices(self, addFunc, prefix, nofDevices):
         devices = list()
 
         for devID in range(0, nofDevices):
-            if (withIP == True):
-                devices.append( addFunc( prefix + str(devID + 1), ip='10.0.0.' + str(devID + 1) ) )
-            else:
-                devices.append( addFunc( prefix + str(devID + 1) ) )
+            devices.append( addFunc( prefix + str(devID + 1) ) )
         return devices
 
     def hookup(self, spineDevices, leafDevices, hostDevices):
