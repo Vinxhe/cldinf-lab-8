@@ -15,11 +15,11 @@ class clos3(Topo):
     def __init__(self, leaf, spine):
         Topo.__init__(self)
 
-        spineDevs = self.create_devices(self.addHost, "ss", spine )
-        leafDevs = self.create_devices(self.addHost, "ls", leaf )
-        hostDevs = self.create_devices(self.addHost, "h", leaf )
+        self.spineDevs = self.create_devices(self.addHost, "ss", spine )
+        self.leafDevs = self.create_devices(self.addHost, "ls", leaf )
+        self.hostDevs = self.create_devices(self.addHost, "h", leaf )
 
-        self.hookup(spineDevs, leafDevs, hostDevs)
+        self.hookup(self.spineDevs, self.leafDevs, self.hostDevs)
 
     def create_devices(self, addFunc, prefix, nofDevices):
         devices = list()
@@ -39,12 +39,33 @@ class clos3(Topo):
 
 topos = { 'clos3': clos3 }
 
+def addIpAddresses(net):
+    for i in range (0, len(net.topo.spineDevs)):
+        spineDev=net.getNodeByName(net.topo.spineDevs[i])
+        for j in range (0, len(spineDev.intfList())):
+            myIp="10." + str(i+1) + "." + str(j+1) + ".1"
+            spineDev.intfList()[j].link.intf1.setIP(myIp, 30)
+            otherIp="10." + str(i+1) + "." + str(j+1) + ".2"
+            spineDev.intfList()[j].link.intf2.setIP(otherIp, 30)
+    for i in range (0, len(net.topo.leafDevs)):
+        leafDev=net.getNodeByName(net.topo.leafDevs[i])
+        otherIp="10.1." + str(i+1) + ".1"
+        leafDev.setDefaultRoute("dev " + leafDev.intfList()[1].name + " via " + otherIp)
+    for i in range (0, len(net.topo.hostDevs)):
+        hostDev=net.getNodeByName(net.topo.hostDevs[i])
+        myIp="10.0." + str(i+1) + ".2"
+        hostDev.intfList()[0].link.intf1.setIP(myIp, 30)
+        otherIp="10.0." + str(i+1) + ".1"
+        hostDev.intfList()[0].link.intf2.setIP(otherIp, 30)
+        hostDev.setDefaultRoute("dev " + hostDev.intfList()[0].name + " via " + otherIp)
+
 def layer3net(leaf, spine):
     if os.geteuid() != 0:
         exit("you need to be root to run this script")
     topo = clos3(leaf, spine)
     info( '*** Creating network\n' )
     net = Mininet(topo=topo, controller=OVSController, switch=OVSSwitch)
+    addIpAddresses(net)
     net.start()
     #dumpNodeConnections(net.values())
 
