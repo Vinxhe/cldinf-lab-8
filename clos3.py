@@ -49,10 +49,10 @@ def addIpAddresses(net):
             spineDev.intfList()[j].link.intf2.setIP(myIp, 30)
             spineDev.intfList()[j].link.intf1.setIP(otherIp, 30)
             clientnet="10.0.{0}.0/30".format(j+1)
-            spinenet="10.{0}.{0}.0/30".format(j+1)
+            spinenet="10.{0}.0.0/16".format(j+1)
             router="10.{0}.{1}.2".format(i+1,j+1)
             #print(spineDev.name + " ip route add " + clientnet + " via " + router)
-            #print(spineDev.name + " ip route add " + spinenet + " via " + router)
+            print(spineDev.name + " ip route add " + spinenet + " via " + router)
             spineDev.cmd("ip route add " + clientnet + " via " + router)
             spineDev.cmd("ip route add " + spinenet + " via " + router)
     for i in range (0, len(net.topo.leafDevs)):
@@ -60,10 +60,11 @@ def addIpAddresses(net):
         leafDev.cmd("sysctl -w net.ipv4.ip_forward=1")
         otherIp="10.1.{0}.1".format(i+1)
         leafDev.cmd("ip route add default via " + otherIp)
-        spineNet="10.{0}.0.0/16".format(i+1)
-        spineRouter="10.{0}.{0}.1".format(i+1)
-        leafDev.cmd("ip route add " + spineNet + " via " + spineRouter)
-        print(leafDev.name + " ip route add " + spineNet + " via " + spineRouter)
+        for j in range (0, len(net.topo.spineDevs)):
+            spineNet="10.{0}.0.0/16".format(j+1)
+            spineRouter="10.{0}.{1}.1".format(j+1,i+1)
+            leafDev.cmd("ip route add " + spineNet + " via " + spineRouter)
+            #print(leafDev.name + " ip route add " + spineNet + " via " + spineRouter)
     for i in range (0, len(net.topo.hostDevs)):
         hostDev=net.getNodeByName(net.topo.hostDevs[i])
         myIp="10.0.{0}.2".format(i+1)
